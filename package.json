@@ -1,0 +1,19 @@
+{
+  "name": "oc_p6_piiquante",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RayanBarbara/OC_P6_Piiquante.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RayanBarbara/OC_P6_Piiquante/issues"
+  },
+  "homepage": "https://github.com/RayanBarbara/OC_P6_Piiquante#readme"
+}
