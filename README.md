@@ -15,9 +15,9 @@ Clone the project:
 ```terminal
 git clone https://github.com/RayanBarbara/OC_P6_Piiquante.git
 ```
-### Front-End
+### Back-End
 
-Go to the front folder and install dependencies :
+Go to the back folder and install dependencies :
 ```terminal
 npm install
 ```
@@ -27,9 +27,9 @@ Start the server and listen to port```3000```!
 nodemon server
 ```
 
-### Back-End
+### Front-End
 
-Go to the back folder and install dependencies :
+Go to the front folder and install dependencies :
 ```terminal
 npm install
 ```
