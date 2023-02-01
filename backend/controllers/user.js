@@ -2,6 +2,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Regular expression which checks if an email is valid
 const emailRegExp = new RegExp('[a-z0-9]+@[a-z]+\.[a-z]{2,3}');
@@ -50,7 +51,7 @@ exports.login = (req, res, next) => {
                 return res.status(401).json({ error: new Error('Incorrect password!') });
             }
             // Call JWT sign function to encode a new token
-            const token = jwt.sign({ userId: user._id }, 'SECRET_TOKEN', { expiresIn: '12h' });
+            const token = jwt.sign({ userId: user._id }, process.env.TOKEN, { expiresIn: '12h' });
             res.status(200).json({ userId: user._id, token: token });
         })
             .catch((error) => {

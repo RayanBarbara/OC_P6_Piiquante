@@ -1,6 +1,7 @@
 // Imports
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
 const path = require('path');
 const userRoutes = require('../backend/routes/user');
 const sauceRoutes = require('../backend/routes/sauce');
@@ -8,10 +9,15 @@ const sauceRoutes = require('../backend/routes/sauce');
 // Create an Express app
 const app = express();
 
+// Parse incoming requests with JSON payloads
 app.use(express.json());
 
 // Connect app to MongoDB database
-mongoose.connect('mongodb+srv://barbaraRayan:barbaraDatabase001@cluster0.qrecskw.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect(process.env.DB_MONGODB,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     console.log('Successfully connected to MongoDB Atlas!');
   })
