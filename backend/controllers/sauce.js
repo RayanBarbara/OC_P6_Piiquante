@@ -1,8 +1,8 @@
 // Imports
 const Sauce = require('../models/sauce');
 const fs = require('fs');
-
-// Exports routes' business logic
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Get all sauces from the database
 exports.getAllSauces = (req, res, next) => {
@@ -115,28 +115,78 @@ exports.deleteSauce = (req, res, next) => {
 
 // Rate a sauce
 exports.rateSauce = (req, res, next) => {
+    // Check if the number of like/dislike in the request are correct
+    if (req.body.like > 1 || req.body.like < -1) {
+        res.status(400).json({ message: 'The number of dislike/like are not correct!' });
+    }
     // Check if the user liked the sauce
     if (req.body.like === 1) {
-        // Use the ID as a parameter to access and update the corresponding sauce in the database
-        Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: req.body.userId }, $inc: { likes: 1 } })
-            .then(() => {
-                res.status(200).json({ message: 'Sauce liked successfully!' });
+        Sauce.findOne({ _id: req.params.id })
+            .then((sauce) => {
+                // Get the user token from the request headers
+                const token = req.headers.authorization.split(' ')[1];
+                let bool = false;
+                // Check if the user did not already liked this sauce by looping trough usersLiked array
+                for (let i = 0; i < sauce.usersLiked.length; i++) {
+                    if (sauce.usersLiked[i] === jwt.verify(token, process.env.TOKEN).userId) {
+                        bool = true;
+                        break;
+                    } else {
+                        bool = false;
+                    }
+                }
+                if (bool) {
+                    res.status(400).json({ message: 'The user already liked this sauce!' });
+                } else {
+                    // Use the ID as a parameter to access and update the corresponding sauce in the database
+                    Sauce.updateOne({ _id: req.params.id }, { $push: { usersLiked: req.body.userId }, $inc: { likes: 1 } })
+                        .then(() => {
+                            res.status(200).json({ message: 'Sauce liked successfully!' });
+                        })
+                        .catch((error) => {
+                            res.status(400).json({ error: error });
+                        });
+                }
             })
             .catch((error) => {
                 res.status(400).json({ error: error });
             });
-        // Check if the user disliked the sauce
-    } else if (req.body.like === -1) {
-        // Use the ID as a parameter to access and update the corresponding sauce in the database
-        Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: req.body.userId }, $inc: { dislikes: 1 } })
-            .then(() => {
-                res.status(200).json({ message: 'Sauce disliked successfully!' });
+    }
+    // Check if the user disliked the sauce
+    else if (req.body.like === -1) {
+        Sauce.findOne({ _id: req.params.id })
+            .then((sauce) => {
+                // Get the user token from the request headers
+                const token = req.headers.authorization.split(' ')[1];
+                let bool = false;
+                // Check if the user did not already disliked this sauce by looping trough usersDisliked array
+                for (let i = 0; i < sauce.usersDisliked.length; i++) {
+                    if (sauce.usersDisliked[i] === jwt.verify(token, process.env.TOKEN).userId) {
+                        bool = true;
+                        break;
+                    } else {
+                        bool = false;
+                    }
+                }
+                if (bool) {
+                    res.status(400).json({ message: 'The user already disliked this sauce!' });
+                } else {
+                    // Use the ID as a parameter to access and update the corresponding sauce in the database
+                    Sauce.updateOne({ _id: req.params.id }, { $push: { usersDisliked: req.body.userId }, $inc: { dislikes: 1 } })
+                        .then(() => {
+                            res.status(200).json({ message: 'Sauce disliked successfully!' });
+                        })
+                        .catch((error) => {
+                            res.status(400).json({ error: error });
+                        });
+                }
             })
             .catch((error) => {
                 res.status(400).json({ error: error });
             });
-            // Check if the user took back his like or dislike
-    } else {
+    }
+    // Check if the user took back his like or dislike
+    else {
         // Use the ID as a parameter to access the corresponding sauce in the database
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
@@ -150,8 +200,9 @@ exports.rateSauce = (req, res, next) => {
                         .catch((error) => {
                             res.status(400).json({ error: error });
                         });
-                        // Check if the user took back his dislike
-                } else {
+                }
+                // Check if the user took back his dislike
+                else {
                     // Use the ID as a parameter to access and update the corresponding sauce in the database
                     Sauce.updateOne({ _id: req.params.id }, { $pull: { usersDisliked: req.body.userId }, $inc: { dislikes: -1 } })
                         .then(() => {

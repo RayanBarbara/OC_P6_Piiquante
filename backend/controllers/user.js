@@ -40,6 +40,14 @@ exports.signup = (req, res, next) => {
 
 // Allow an user to login
 exports.login = (req, res, next) => {
+    // Check if the email is valid
+    if (!emailRegExp.test(req.body.email)) {
+        return res.status(401).json({ error: new Error('Invalid email!') });
+    }
+    // Check if the password is only made up of letters and numbers
+    if (!passwordRegExp.test(req.body.password)) {
+        return res.status(401).json({ error: new Error('Only letters and numbers are allowed!') });
+    }
     // Find and get a specified user from the database
     User.findOne({ email: req.body.email }).then((user) => {
         if (!user) {
